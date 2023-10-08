@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError, HttpResponseBadRequest, HttpResponseForbidden
 from django.template import RequestContext
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 pri_data = {
         '1' : ['Абрамов Александр Альбертович', '2004'],
@@ -37,7 +37,7 @@ class year_interpreter():
         if int(self.year) >= 2015 and int(self.year) <= 2025:
             return f"Год {year_animal[self.year - 2014]}"
         else:
-            return "Такого года нету"
+            return HttpResponse("Такого года нету")
 
 
 
@@ -45,9 +45,10 @@ class year_interpreter():
 def index(request):
     get = request.GET
     get_1 = dict(get)
-    get_2 = get_1['name'][0]
-    print(get_2)
-    return HttpResponse(f"{get_2}")
+    #get_2 = get_1['name'][0]
+    #print(get_2)
+    return redirect("/pri/1")
+    return HttpResponse(f"{get_1}")
 
 
 def about(request):
@@ -80,8 +81,13 @@ def categories(request, cat):
     return HttpResponse('<h1> Ошибка </h1> <h3> Такого студента не существует </h3>')
 
 def year_handler(request, year_number):
-    y_i = year_interpreter(year_number)
-    return HttpResponse(f"<h1> {y_i.print()} </h1>")
+    if int(year_number) >= 2015 and int(year_number) <= 2025:
+        y_i = year_interpreter(year_number)
+        return HttpResponse(f"<h1> {y_i.print()} </h1>")
+    else:
+        return redirect("/about")
+
+
 def pageNotFound(request, exception):
     return HttpResponseNotFound("<h1> Страница не найдена проверьте адресс. </h1>")
 
